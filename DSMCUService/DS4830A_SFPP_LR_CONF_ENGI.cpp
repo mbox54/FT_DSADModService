@@ -732,6 +732,304 @@ int CDS4830A_SFPP_LR_CONF_ENGI::TableValues_SaveToFile(BYTE * v_ByteData)
 	return OP_SUCCESS;
 }
 
+void CDS4830A_SFPP_LR_CONF_ENGI::UpdateRead()
+{
+	// > Read Table
+	NoUpdateRead();
+
+	// > Update Output Controls
+	// > > Get Table Values
+	BYTE uValues[256];
+	m_Grid.GridSFF_Read(uValues, 0, 256);	
+	
+	// > > Set Sliders Position
+	// [SLIDER BIAS]
+	// Get Value
+	un_WordAndBytes unComplexValue;
+
+	unComplexValue.strucValue.ucByte02 = uValues[0x80 + ADDR_BIAS];
+	unComplexValue.strucValue.ucByte01 = uValues[0x80 + ADDR_BIAS + 1];
+
+	// Set Slider Control
+	this->m_Slider_BIAS.SetPos(unComplexValue.usWordValue);
+
+	// Set Static Control
+	CString strValue;
+	strValue.Format(L"%d", unComplexValue.usWordValue);
+
+	CWnd *pStaticBIAS = this->GetDlgItem(IDC_STATIC_BIAS);
+	pStaticBIAS->SetWindowTextW(strValue);
+
+	// Set Edit Control
+	strValue.Truncate(0);
+	strValue.Format(_T("%02X"), unComplexValue.strucValue.ucByte02);
+	this->m_Edit_Bias_H.SetWindowTextW(strValue);
+
+	strValue.Truncate(0);
+	strValue.Format(_T("%02X"), unComplexValue.strucValue.ucByte01);
+	this->m_Edit_Bias_L.SetWindowTextW(strValue);
+
+
+	// [SLIDER MOD]
+	// Get Value
+	unComplexValue.strucValue.ucByte02 = uValues[0x80 + ADDR_MOD];
+	unComplexValue.strucValue.ucByte01 = uValues[0x80 + ADDR_MOD + 1];
+
+	// Set Slider Control
+	this->m_Slider_MOD.SetPos(unComplexValue.usWordValue);
+
+	// Set Static Control
+	strValue.Truncate(0);
+	strValue.Format(L"%d", unComplexValue.usWordValue);
+
+	CWnd *pStaticMOD = this->GetDlgItem(IDC_STATIC_MOD);
+	pStaticMOD->SetWindowTextW(strValue);
+
+	// Set Edit Control
+	strValue.Truncate(0);
+	strValue.Format(_T("%02X"), unComplexValue.strucValue.ucByte02);
+	this->m_Edit_Mod_H.SetWindowTextW(strValue);
+
+	strValue.Truncate(0);
+	strValue.Format(_T("%02X"), unComplexValue.strucValue.ucByte01);
+	this->m_Edit_Mod_L.SetWindowTextW(strValue);
+
+
+	// [SLIDER HORISON]
+	// Get Value
+	BYTE ucByte = uValues[0x80 + ADDR_HORISON];
+
+	// define direction
+	// define Value
+	BYTE bPosDirection;
+	char cPosValue;
+
+	bPosDirection = ucByte >> 1;
+	cPosValue = bPosDirection;
+
+	bPosDirection = ucByte;
+	bPosDirection &= 0x01;
+	if (bPosDirection == 0)
+	{
+		// [POS]
+		//		
+	}
+	else
+	{
+		// [NEG]
+
+		cPosValue *= (-1);
+	}
+
+	// Set Slider Control
+	this->m_Slider_HORISON.SetPos(cPosValue);
+
+	// Set Static Control
+	strValue.Truncate(0);
+	strValue.Format(L"%d", cPosValue);
+
+	CWnd *pStaticHOR = this->GetDlgItem(IDC_STATIC_HOR);
+	pStaticHOR->SetWindowTextW(strValue);
+
+	// Set Edit Control
+	strValue.Truncate(0);
+	strValue.Format(_T("%02X"), ucByte);
+	this->m_Edit_Horison.SetWindowTextW(strValue);
+
+	// [SLIDER VERTICAL]
+	// Get Value
+	ucByte = uValues[0x80 + ADDR_VERTICAL];
+
+	// define state: active/deactive
+	// define Value
+	BYTE bPosState = ucByte >> 1;
+	cPosValue = bPosState;
+
+	bPosState = ucByte;
+	bPosState &= 0x01;
+
+	CWnd *wndSlide = this->GetDlgItem(IDC_SLIDER_VERTICAL);
+	if (bPosState == 0)
+	{
+		// [DEACTICE]
+
+		// set CheckBox Control
+		m_bCheck_Vertical = 0;
+
+		// disable Control
+		wndSlide->EnableWindow(FALSE);
+	}
+	else
+	{
+		// [ACTIVE]
+
+		// set CheckBox Control
+		m_bCheck_Vertical = 1;
+
+		// enadle Control
+		wndSlide->EnableWindow(TRUE);
+	}
+
+	// Set Slider Control
+	this->m_Slider_VERTICAL.SetPos(cPosValue);
+
+	// Set Static Control
+	strValue.Truncate(0);
+	strValue.Format(L"%d", cPosValue);
+
+	CWnd *pStaticVERT = this->GetDlgItem(IDC_STATIC_VERT);
+	pStaticVERT->SetWindowTextW(strValue);
+
+	// Set Edit Control
+	strValue.Truncate(0);
+	strValue.Format(_T("%02X"), ucByte);
+	this->m_Edit_Vertical.SetWindowTextW(strValue);
+
+	// > Update interface for Write controls
+	UpdateData(FALSE);	
+
+}
+
+
+void CDS4830A_SFPP_LR_CONF_ENGI::NoUpdateRead()
+{
+	Trace(_T("ÔÓÔ˚ÚÍ‡: ◊“≈Õ»≈\n"));
+	Trace(_T("Ô‡‡ÏÂÚ˚: A2-T10-PASS, 256 ·‡ÈÚ\n"));
+
+
+	// Valid ConfigTable Values
+	unsigned char v_TablName[1] = { 0x10 };
+	//	unsigned char v_TablPass[4] = { 'O', 'P', 'W', 'Y' };
+	unsigned char v_TablPass[4]; // = { 0x00, 0x11, 0x22, 0x33 };
+
+
+								 // get Password 4Bytes
+	UpdateData(TRUE);
+
+	CString strHex;
+
+	for (unsigned char k = 0; k < 4; k++)
+	{
+		char cPassLetter[2];
+		cPassLetter[0] = m_sEdit_PassValue[k * 2];
+		cPassLetter[1] = m_sEdit_PassValue[k * 2 + 1];
+
+		strHex.AppendChar(cPassLetter[0]);
+		strHex.AppendChar(cPassLetter[1]);
+
+		// convert to Byte
+		unsigned char byte_passLetter;
+		byte_passLetter = (BYTE)_tcstoul(strHex, NULL, 16);
+
+		v_TablPass[k] = byte_passLetter;
+
+		strHex.Truncate(0);
+	}
+
+	unsigned char v_WrByte[1];
+
+	// progress component
+	p_cPB_OP->SetPos(0);
+
+	// send Table
+	// write tabl in Device
+	BYTE retVal = m_Grid.DeviceSlave_Write(v_TablName, SLAVEADDR_A2, 0x7F, 1);
+	if (retVal != HID_SMBUS_SUCCESS)
+	{
+		Trace(_T("Œÿ»¡ ¿. [ÍÓ‰: %02d] \n"), retVal);
+		Trace(_T("Õ¿ ›“¿œ≈: ¬€¡Œ– “¿¡À»÷€ \n"), retVal);
+	}
+
+	if (retVal == HID_SMBUS_SUCCESS)
+	{
+		Sleep(30);
+
+		p_cPB_OP->SetPos(30);
+
+		// send password
+		// write pass in Device
+		for (unsigned char k = 0; k < 4; k++)
+		{
+			v_WrByte[0] = v_TablPass[k];
+			retVal = m_Grid.DeviceSlave_Write(v_WrByte, SLAVEADDR_A2, 0x7B + k, 1);
+
+			if (retVal != HID_SMBUS_SUCCESS)
+			{
+				Trace(_T("Œÿ»¡ ¿. [ÍÓ‰: %02d] \n"), retVal);
+				Trace(_T("Õ¿ ›“¿œ≈: ¬¬Œƒ œ¿–ŒÀﬂ \n"), retVal);
+
+				break;
+			}
+
+			Sleep(10);
+
+			p_cPB_OP->SetPos(30 + 5 * k);
+		}
+	}
+
+	if (retVal == HID_SMBUS_SUCCESS)
+	{
+		// Read op
+		Sleep(30);
+
+		p_cPB_OP->SetPos(80);
+
+		//m_Grid.DeviceSlave_ReadTimer(uValues2, 0, SLAVEADDR_A2, 0, 256, 0, 0);
+		retVal = m_Grid.DeviceSlave_Read(uValues2, SLAVEADDR_A2, 0, 256);
+
+		if (retVal != HID_SMBUS_SUCCESS)
+		{
+			// error: Device Read
+			Trace(_T("Œÿ»¡ ¿. [ÍÓ‰: %02d] \n"), retVal);
+			Trace(_T("Õ¿ ›“¿œ≈: «¿√–”« ¿ “¿¡À»÷€ \n"), retVal);
+		}
+	}
+
+	if (retVal != HID_SMBUS_SUCCESS)
+	{
+		CString str_ErrText;
+		switch (retVal)
+		{
+		case 1:
+			str_ErrText.AppendFormat(L"(MAXQBL_NO_DEVICE)");
+
+			break;
+
+		case 2:
+			str_ErrText.AppendFormat(L"(MAXQBL_DEV_INACCESSIBLE)");
+
+			break;
+
+		case 3:
+			str_ErrText.AppendFormat(L"(MAXQBL_OP_FAILED)");
+
+			break;
+
+		case 4:
+			str_ErrText.AppendFormat(L"(MAXQBL_OP_WRONG)");
+
+			break;
+
+		default:
+			break;
+		}
+
+		// err comment output
+		Trace(str_ErrText, '\n');
+		Trace(_T("-----------------------\n"));
+
+		return;
+	}
+
+	Trace(_T("”—œ≈ÿÕŒ.\n"));
+	Trace(_T("-----------------------\n"));
+
+	m_Grid.GridSFF_Write(uValues2, 0, 256);
+
+	p_cPB_OP->SetPos(100);
+
+}
+
 void CDS4830A_SFPP_LR_CONF_ENGI::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -797,6 +1095,7 @@ BEGIN_MESSAGE_MAP(CDS4830A_SFPP_LR_CONF_ENGI, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_CONF_WRITE, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonConfWrite)
 
 
+	ON_BN_CLICKED(IDC_CHECK_VERTICAL, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedCheckVertical)
 END_MESSAGE_MAP()
 
 
@@ -886,6 +1185,7 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonBiasSet()
 
 	_word = (WORD)_tcstoul(str, NULL, 16);
 
+/*
 	// Check Valid range
 	if (_word < VALUE_BIAS_MIN)
 	{
@@ -912,6 +1212,7 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonBiasSet()
 		// abort
 		return;
 	}
+*/
 
 	// > Write Value in Grid
 	// get Grid Values
@@ -1006,6 +1307,7 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonModSet()
 
 	_word = (WORD)_tcstoul(str, NULL, 16);
 
+/*
 	// Check Valid range
 	if (_word < VALUE_MOD_MIN)
 	{
@@ -1032,6 +1334,8 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonModSet()
 		// abort
 		return;
 	}
+*/
+
 
 	// > Write Value in Grid
 	// get Grid Values
@@ -1125,82 +1429,23 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonVerticalSet()
 
 void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton4()
 {
-	// Valid ConfigTable Values
-	unsigned char v_TablName[1] = { 0x10 };
-//	unsigned char v_TablPass[4] = { 'O', 'P', 'W', 'Y' };
-	unsigned char v_TablPass[4]; // = { 0x00, 0x11, 0x22, 0x33 };
+	UpdateRead();
 
-
-	// get Password 4Bytes
-	UpdateData(TRUE);
-
-	CString strHex;
-
-	for (unsigned char k = 0; k < 4; k++)
-	{
-		char cPassLetter[2];
-		cPassLetter[0] = m_sEdit_PassValue[k * 2];
-		cPassLetter[1] = m_sEdit_PassValue[k * 2 + 1];
-
-		strHex.AppendChar(cPassLetter[0]);
-		strHex.AppendChar(cPassLetter[1]);
-
-		// convert to Byte
-		unsigned char byte_passLetter;
-		byte_passLetter = (BYTE)_tcstoul(strHex, NULL, 16);
-
-		v_TablPass[k] = byte_passLetter;
-
-		strHex.Truncate(0);
-	}
-
-	unsigned char v_WrByte[1];
-
-	// progress component
-	p_cPB_OP->SetPos(0);
-
-	// send Table
-	// write tabl in Device
-	m_Grid.DeviceSlave_Write(v_TablName, SLAVEADDR_A2, 0x7F, 1);
-	Sleep(60);
-
-	p_cPB_OP->SetPos(30);
-
-	// send password
-	// write pass in Device
-	for (unsigned char k = 0; k < 4; k++)
-	{
-		v_WrByte[0] = v_TablPass[k];
-		m_Grid.DeviceSlave_Write(v_WrByte, SLAVEADDR_A2, 0x7B + k, 1);
-
-		Sleep(10);
-
-		p_cPB_OP->SetPos(30 + 5 * k);
-	}
-
-
-	// Read op
-	Sleep(50);
-
-	p_cPB_OP->SetPos(80);
-
-	//m_Grid.DeviceSlave_ReadTimer(uValues2, 0, SLAVEADDR_A2, 0, 256, 0, 0);
-	m_Grid.DeviceSlave_Read(uValues2, SLAVEADDR_A2, 0, 256);
-
-	m_Grid.GridSFF_Write(uValues2, 0, 256);
-
-	p_cPB_OP->SetPos(100);
 }
 
 
 void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton5()
 {
+	Trace(_T("ÔÓÔ˚ÚÍ‡: Œ¡ÕŒ¬À≈Õ»≈ \n"));
+	Trace(_T("Ô‡‡ÏÂÚ˚: A2-T10-PASS, 256 ·‡ÈÚ\n"));
+
 	// Valid ConfigTable Values
 	unsigned char v_TablName[1] = { 0x10 };
-//	unsigned char v_TablPass[4] = { 'O', 'P', 'W', 'Y' };
-	unsigned char v_TablPass[4];
+	//	unsigned char v_TablPass[4] = { 'O', 'P', 'W', 'Y' };
+	unsigned char v_TablPass[4]; // = { 0x00, 0x11, 0x22, 0x33 };
 
-	// get Password 4Bytes
+
+								 // get Password 4Bytes
 	UpdateData(TRUE);
 
 	CString strHex;
@@ -1228,46 +1473,108 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton5()
 
 	// send Table
 	// write tabl in Device
-	m_Grid.DeviceSlave_Write(v_TablName, SLAVEADDR_A2, 0x7F, 1);
-	Sleep(30);
-
-	p_cPB_OP->SetPos(20);
-
-	// send password
-	// write pass in Device
-	m_Grid.DeviceSlave_Write(v_TablPass, SLAVEADDR_A2, 0x7B, 4);
-	Sleep(30);
-
-	p_cPB_OP->SetPos(40);
-
-	// write op
-	//m_Grid.GridSFF_Read(uValues2, 128, 128);
-
-	// NOTE:
-	// it is must to:
-	// write ALL 128 bytes of TABLE
-	unsigned char v_GridVal_T10[128];
-	unsigned char v_WrByte8[8];
-
-	// get Values
-	m_Grid.GridSFF_Read(v_GridVal_T10, 0x80, 128);
-
-	// Write to Device
-	for (int k = 0; k < 16; k++)
+	BYTE retVal = m_Grid.DeviceSlave_Write(v_TablName, SLAVEADDR_A2, 0x7F, 1);
+	if (retVal != HID_SMBUS_SUCCESS)
 	{
-		// prepare write buffer
-		for (int k2 = 0; k2 < 8; k2++)
+		Trace(_T("Œÿ»¡ ¿. [ÍÓ‰: %02d] \n"), retVal);
+		Trace(_T("Õ¿ ›“¿œ≈: ¬€¡Œ– “¿¡À»÷€ \n"), retVal);
+	}
+
+	if (retVal == HID_SMBUS_SUCCESS)
+	{
+		Sleep(30);
+
+		p_cPB_OP->SetPos(20);
+
+		// send password
+		// write pass in Device
+		retVal = m_Grid.DeviceSlave_Write(v_TablPass, SLAVEADDR_A2, 0x7B, 4);
+
+		if (retVal != HID_SMBUS_SUCCESS)
 		{
-			v_WrByte8[k2] = v_GridVal_T10[k * 8 + k2];
+			Trace(_T("Œÿ»¡ ¿. [ÍÓ‰: %02d] \n"), retVal);
+			Trace(_T("Õ¿ ›“¿œ≈: ¬¬Œƒ œ¿–ŒÀﬂ \n"), retVal);
 		}
 
-		// i2c write
-		m_Grid.DeviceSlave_Write(v_WrByte8, SLAVEADDR_A2, 0x80 + k * 8, 8);
+		Sleep(30);
 
-		p_cPB_OP->SetPos(40 + k * 7);
-
-		Sleep(10);
+		p_cPB_OP->SetPos(40);
 	}
+
+	if (retVal == HID_SMBUS_SUCCESS)
+	{
+		// NOTE:
+		// it is must to:
+		// write ALL 128 bytes of TABLE
+		unsigned char v_GridVal_T10[128];
+		unsigned char v_WrByte8[8];
+
+		// get Values
+		m_Grid.GridSFF_Read(v_GridVal_T10, 0x80, 128);
+
+		// Write to Device
+		for (int k = 0; k < 16; k++)
+		{
+			// prepare write buffer
+			for (int k2 = 0; k2 < 8; k2++)
+			{
+				v_WrByte8[k2] = v_GridVal_T10[k * 8 + k2];
+			}
+
+			// i2c write
+			retVal = m_Grid.DeviceSlave_Write(v_WrByte8, SLAVEADDR_A2, 0x80 + k * 8, 8);
+
+			if (retVal != HID_SMBUS_SUCCESS)
+			{
+				// error: Device Read
+				Trace(_T("Œÿ»¡ ¿. [ÍÓ‰: %02d] \n"), retVal);
+				Trace(_T("Õ¿ ›“¿œ≈: Œ¡ÕŒ¬À≈Õ»≈ “¿¡À»÷€ \n"), retVal);
+			}
+
+			p_cPB_OP->SetPos(40 + k * 7);
+
+			Sleep(10);
+		}
+	}
+
+	if (retVal != HID_SMBUS_SUCCESS)
+	{
+		CString str_ErrText;
+		switch (retVal)
+		{
+		case 1:
+			str_ErrText.AppendFormat(L"(MAXQBL_NO_DEVICE)");
+
+			break;
+
+		case 2:
+			str_ErrText.AppendFormat(L"(MAXQBL_DEV_INACCESSIBLE)");
+
+			break;
+
+		case 3:
+			str_ErrText.AppendFormat(L"(MAXQBL_OP_FAILED)");
+
+			break;
+
+		case 4:
+			str_ErrText.AppendFormat(L"(MAXQBL_OP_WRONG)");
+
+			break;
+
+		default:
+			break;
+		}
+
+		// err comment output
+		Trace(str_ErrText, '\n');
+		Trace(_T("-----------------------\n"));
+
+		return;
+	}
+
+	Trace(_T("”—œ≈ÿÕŒ.\n"));
+	Trace(_T("-----------------------\n"));
 
 	p_cPB_OP->SetPos(100);
 	//	m_Grid.DeviceSlave_WriteTimer(uValues2, 0, SLAVEADDR_A2, 128 + 8, 8, 0, 0);
@@ -1587,19 +1894,46 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* 
 
 	}
 
+
+	if (nSBCode == SB_ENDSCROLL)
+	{
+		// TODO: Find source of 2nd msg.
+		if (m_bOnHScrollDouble)
+		{
+			// [SECOND MSG]
+
+			// reset Flag
+			m_bOnHScrollDouble = 0;			
+		}
+		else
+		{
+			// [FIRST MSG]
+
+			// set Flag
+			//m_bOnHScrollDouble = 1;
+
+			// > Proc 
+			// Read previous
+			NoUpdateRead();
+
+			// Update from Sliders
+			OnBnClickedButtonBiasSet();
+			OnBnClickedButtonModSet();
+			OnBnClickedButtonHorSet();
+			OnBnClickedButtonVerticalSet();
+
+			// Write
+			OnBnClickedButton5();
+
+		}
+
+	}
+
 	if (nSBCode == TB_THUMBTRACK)
 	{
 		
 	}
 
-
-	if (nSBCode == SB_ENDSCROLL)
-	{
-
-
-	}
-
-	//Trace(_T("y"));
 
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -1641,4 +1975,69 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnOK()
 	// TODO: Add your specialized code here and/or call the base class
 
 	// CDialogEx::OnOK();
+}
+
+
+void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedCheckVertical()
+{
+	CWnd *pStaticVERT = this->GetDlgItem(IDC_STATIC_VERT);
+
+	// Update contents for Read controls
+	UpdateData(TRUE);
+
+	// Get current Slider position
+	unsigned char iPos = this->m_Slider_VERTICAL.GetPos();
+
+	// convert to str
+	CString str;
+	str.Format(L"%d", iPos);
+
+	// Out to Interface control Label
+	pStaticVERT->SetWindowTextW(str);
+
+	// Out to Interface control Edits
+	// Format Value
+	// FORMAT:
+	// 1Byte = bits:: data:7654321, active:0
+
+	// define Status
+	// set Slidebar Enable State
+	unsigned char iStatus;
+
+	CWnd *wndSlide = this->GetDlgItem(IDC_SLIDER_VERTICAL);
+
+	UpdateData(TRUE);
+	if (m_bCheck_Vertical)
+	{
+		iStatus = 1;
+
+		// enadle Control
+		wndSlide->EnableWindow(TRUE);
+
+	}
+	else
+	{
+		iStatus = 0;
+
+		// disable Control
+		wndSlide->EnableWindow(FALSE);
+	}
+
+	// define Value
+	unsigned char iPosFormat;
+
+	iPosFormat = iPos;
+	iPosFormat = iPosFormat << 1;
+	iPosFormat &= 0xFE;
+	iPosFormat += iStatus;
+
+	// Out to Interface control Edits
+	// // Convert to String Hex
+	// // Out in Edits
+	CString str_hex;
+	str_hex.Format(_T("%02X"), iPosFormat);
+	this->m_Edit_Vertical.SetWindowTextW(str_hex);
+
+	// Update interface for Write controls
+	UpdateData(FALSE);
 }

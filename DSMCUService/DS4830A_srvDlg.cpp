@@ -1320,7 +1320,7 @@ void CDS4830A_srvDlg::OnBnClickedButtonWrite()
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		// Read OP
-		m_DS4830A_SFPP_LR_CONF_OPER.OnBnClickedButton4();
+		m_DS4830A_SFPP_LR_CONF_OPER.NoUpdateRead();
 
 		// Set OP
 		m_DS4830A_SFPP_LR_CONF_OPER.OnBnClickedButtonBiasSet();
@@ -1338,7 +1338,7 @@ void CDS4830A_srvDlg::OnBnClickedButtonWrite()
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		// Read OP
-		//m_DS4830A_SFPP_LR_CONF_ENGI.OnBnClickedButton4();
+		m_DS4830A_SFPP_LR_CONF_ENGI.NoUpdateRead();
 
 		// Set OP
 		m_DS4830A_SFPP_LR_CONF_ENGI.OnBnClickedButtonBiasSet();
@@ -1556,19 +1556,40 @@ void CDS4830A_srvDlg::OnBnClickedButtonTestboardReset()
 	
 	// reset CP2112
 	BYTE retVal = HidSmbus_Reset(*m_pHidSmbus);
-	Sleep(50);
+	m_cPB_OP.SetPos(0);
+	// NOTE: To reset ~1300ms is needed.
+	Sleep(200);
+	m_cPB_OP.SetPos(15);
+	Sleep(200);
+	m_cPB_OP.SetPos(30);
+	Sleep(200);
+	m_cPB_OP.SetPos(45);
+	Sleep(200);
+	m_cPB_OP.SetPos(60);
+	Sleep(200);
+	m_cPB_OP.SetPos(75);
+	Sleep(100);
+	m_cPB_OP.SetPos(85);
+	
+
 
 	// open CP2112 Last connection
 	retVal = HidSmbus_Open(m_pHidSmbus, mc_CP2112_activeDeviceNum, VID, PID);
 	Sleep(50);
 
+	m_cPB_OP.SetPos(90);
+
 	// Set GPIO direction and mode bitmasks
 	retVal = HidSmbus_SetGpioConfig(*m_pHidSmbus, mc_CP2112_GPConf.direction, mc_CP2112_GPConf.mode, mc_CP2112_GPConf.function, 0);
 	Sleep(50);
 
+	m_cPB_OP.SetPos(95);
+
 	// reinit
 	retVal = HidSmbus_WriteLatch(*m_pHidSmbus, 0x00, 0xFF);
 	Sleep(50);
+
+	m_cPB_OP.SetPos(100);
 
 	if (retVal != HID_SMBUS_SUCCESS)
 	{

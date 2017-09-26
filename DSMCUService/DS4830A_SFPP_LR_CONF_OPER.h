@@ -45,6 +45,7 @@
 #define ADDR_HORISON			0x02
 #define ADDR_VERTICAL			0x01
 
+
 // ##########################################################################
 // CDS4830A_SFPP_LR_CONF_ dialog
 // ##########################################################################
@@ -78,6 +79,8 @@ private:
 	// dialog internal grid operations
 	BYTE uValues[256];
 
+	// OnHScroll get 2 copies of msg. Second is needless.
+	BYTE m_bOnHScrollDouble = 0;
 
 protected:
 
@@ -91,16 +94,7 @@ protected:
 
 	// Table File OP
 	int TableValues_LoadFromFile(BYTE * v_ByteData);
-	int TableValues_SaveToFile(BYTE * v_ByteData);
-
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-		
-	// Grid events
-	afx_msg void OnGridClick(NMHDR *pNotifyStruct, LRESULT* pResult);
-	afx_msg void OnGridEndEdit(NMHDR *pNotifyStruct, LRESULT* pResult);
-
-	// Slider events
-	afx_msg void OnSliderBIASMove(NMHDR *pNotifyStruct, LRESULT* pResult);
+	int TableValues_SaveToFile(BYTE * v_ByteData);	
 
 	
 	DECLARE_MESSAGE_MAP()
@@ -145,8 +139,21 @@ public:
 	CSliderCtrl m_Slider_HORISON;
 	CSliderCtrl m_Slider_VERTICAL;
 
+
 public:
+
+	void UpdateRead();
+	void NoUpdateRead();
+
 	virtual BOOL OnInitDialog();
+
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+														// Grid events
+	afx_msg void OnGridClick(NMHDR *pNotifyStruct, LRESULT* pResult);
+	afx_msg void OnGridEndEdit(NMHDR *pNotifyStruct, LRESULT* pResult);
+
+	// Slider events
+	afx_msg void OnSliderBIASMove(NMHDR *pNotifyStruct, LRESULT* pResult);
 
 	afx_msg void OnBnClickedButton4();
 	afx_msg void OnBnClickedButton5();
@@ -172,4 +179,5 @@ public:
 	afx_msg void OnBnClickedCheckBiasModDependance();
 	CString m_sEdit_PassValue;
 	virtual void OnOK();
+	afx_msg void OnNMCustomdrawSliderVertical(NMHDR *pNMHDR, LRESULT *pResult);
 };

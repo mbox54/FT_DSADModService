@@ -48,8 +48,20 @@ struct st_serviceData
 
 };
 
+// service
+struct st_TwoBytes
+{
+	BYTE ucByte01;
+	BYTE ucByte02;
 
+};
 
+union un_WordAndBytes
+{
+	WORD usWordValue;
+
+	st_TwoBytes strucValue;
+};
 
 // CDSMCUServiceApp:
 // See DSMCUService.cpp for the implementation of this class
