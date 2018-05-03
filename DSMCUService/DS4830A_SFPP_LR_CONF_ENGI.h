@@ -116,6 +116,8 @@ public:
 
 	CEdit m_Edit_Vertical;
 
+	CString m_sEdit_PassValue;
+
 	// main window status progress
 	CProgressCtrl * p_cPB_OP;
 
@@ -161,7 +163,7 @@ public:
 	afx_msg void OnBnClickedButtonHorSet();
 //	afx_msg void OnBnClickedCheckVertical();
 	afx_msg void OnBnClickedButtonVerticalSet();
-	CString m_sEdit_PassValue;
+
 	virtual void OnOK();
 	afx_msg void OnBnClickedCheckVertical();
 };

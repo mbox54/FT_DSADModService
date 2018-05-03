@@ -111,4 +111,8 @@ public:
 //	CEdit m;
 	CString m_SelCount;
 	BOOL m_bCheck_TabSelect;
+//	CButton m_bCheck_AutoClear;
+	BOOL m_bCheck_AutoClear;
+	afx_msg void OnBnClickedButton6();
+	int m_RadioWorkMode;
 };

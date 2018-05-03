@@ -185,6 +185,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ADUC7029_XFP_WDM_CONF_ENGI.h" />
     <ClInclude Include="DlgTabCtrl.h" />
     <ClInclude Include="DS4830A_SFF_Custom.h" />
     <ClInclude Include="DS4830A_SFPP_DDM.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="DS4830A_SFPP_ER_ENGI.h" />
     <ClInclude Include="DS4830A_SFPP_A0.h" />
     <ClInclude Include="DS4830A_SFPP_A2.h" />
+    <ClInclude Include="DS4830A_SFP_LX_CONF_ENGI.h" />
     <ClInclude Include="DS4830A_srvDlg.h" />
     <ClInclude Include="DSBootLoader.h" />
     <ClInclude Include="DSMCUService.h" />
@@ -219,6 +221,7 @@
     <ClInclude Include="TB_SFP_R2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ADUC7029_XFP_WDM_CONF_ENGI.cpp" />
     <ClCompile Include="DlgTabCtrl.cpp" />
     <ClCompile Include="DS4830A_SFF_Custom.cpp" />
     <ClCompile Include="DS4830A_SFPP_DDM.cpp" />
@@ -229,6 +232,7 @@
     <ClCompile Include="DS4830A_SFPP_ER_ENGI.cpp" />
     <ClCompile Include="DS4830A_SFPP_A0.cpp" />
     <ClCompile Include="DS4830A_SFPP_A2.cpp" />
+    <ClCompile Include="DS4830A_SFP_LX_CONF_ENGI.cpp" />
     <ClCompile Include="DS4830A_srvDlg.cpp" />
     <ClCompile Include="DSBootLoader.cpp" />
     <ClCompile Include="DSMCUService.cpp" />

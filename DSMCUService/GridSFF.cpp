@@ -510,6 +510,7 @@ void CGridSFF::GridSFF_Read_UpdateRange(BYTE * v_ByteData, BYTE startAddr, WORD 
 	}
 }
 
+
 // Use: simple Read Grid OP
 // FROM: startAddr TO: startAddr + count
 // in Memory

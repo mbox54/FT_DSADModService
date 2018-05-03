@@ -33,6 +33,30 @@ CDS4830A_SFPP_LR_CONF_ENGI::~CDS4830A_SFPP_LR_CONF_ENGI()
 {
 }
 
+BEGIN_MESSAGE_MAP(CDS4830A_SFPP_LR_CONF_ENGI, CDialogEx)
+
+	// Grid event functions
+	ON_NOTIFY(NM_CLICK, IDC_GRID, OnGridClick)
+	ON_NOTIFY(GVN_ENDLABELEDIT, IDC_GRID, OnGridEndEdit)
+
+	ON_WM_HSCROLL()
+	ON_WM_VSCROLL()
+
+	ON_BN_CLICKED(IDC_BUTTON1, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON_BIAS_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonBiasSet)
+	ON_BN_CLICKED(IDC_BUTTON_MOD_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonModSet)
+	ON_BN_CLICKED(IDC_BUTTON_HOR_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonHorSet)
+	ON_BN_CLICKED(IDC_BUTTON_VERTICAL_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonVerticalSet)
+	ON_BN_CLICKED(IDC_BUTTON4, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_BUTTON5, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton5)
+	ON_BN_CLICKED(IDC_BUTTON_CONF_READ, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonConfRead)
+	ON_BN_CLICKED(IDC_BUTTON_CONF_WRITE, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonConfWrite)
+
+
+	ON_BN_CLICKED(IDC_CHECK_VERTICAL, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedCheckVertical)
+END_MESSAGE_MAP()
+
+
 void CDS4830A_SFPP_LR_CONF_ENGI::Trace(LPCTSTR szFmt, ...)
 {
 	CString str;
@@ -1075,30 +1099,6 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnGridEndEdit(NMHDR * pNotifyStruct, LRESULT * 
 }
 
 
-BEGIN_MESSAGE_MAP(CDS4830A_SFPP_LR_CONF_ENGI, CDialogEx)
-
-	// Grid event functions
-	ON_NOTIFY(NM_CLICK, IDC_GRID, OnGridClick)
-	ON_NOTIFY(GVN_ENDLABELEDIT, IDC_GRID, OnGridEndEdit)
-
-	ON_WM_HSCROLL()
-	ON_WM_VSCROLL()
-
-	ON_BN_CLICKED(IDC_BUTTON1, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON_BIAS_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonBiasSet)
-	ON_BN_CLICKED(IDC_BUTTON_MOD_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonModSet)
-	ON_BN_CLICKED(IDC_BUTTON_HOR_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonHorSet)
-	ON_BN_CLICKED(IDC_BUTTON_VERTICAL_SET, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonVerticalSet)
-	ON_BN_CLICKED(IDC_BUTTON4, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton4)
-	ON_BN_CLICKED(IDC_BUTTON5, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton5)
-	ON_BN_CLICKED(IDC_BUTTON_CONF_READ, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonConfRead)
-	ON_BN_CLICKED(IDC_BUTTON_CONF_WRITE, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButtonConfWrite)
-
-
-	ON_BN_CLICKED(IDC_CHECK_VERTICAL, &CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedCheckVertical)
-END_MESSAGE_MAP()
-
-
 // DS4830A_SFPP_LR_CONF_ENGI message handlers
 
 
@@ -1512,29 +1512,33 @@ void CDS4830A_SFPP_LR_CONF_ENGI::OnBnClickedButton5()
 		// get Values
 		m_Grid.GridSFF_Read(v_GridVal_T10, 0x80, 128);
 
-		// Write to Device
-		for (int k = 0; k < 16; k++)
-		{
-			// prepare write buffer
-			for (int k2 = 0; k2 < 8; k2++)
-			{
-				v_WrByte8[k2] = v_GridVal_T10[k * 8 + k2];
-			}
+		//// Write to Device
+		//for (int k = 0; k < 16; k++)
+		//{
+		//	// prepare write buffer
+		//	for (int k2 = 0; k2 < 8; k2++)
+		//	{
+		//		v_WrByte8[k2] = v_GridVal_T10[k * 8 + k2];
+		//	}
 
-			// i2c write
-			retVal = m_Grid.DeviceSlave_Write(v_WrByte8, SLAVEADDR_A2, 0x80 + k * 8, 8);
+		//	// i2c write
+		//	retVal = m_Grid.DeviceSlave_Write(v_WrByte8, SLAVEADDR_A2, 0x80 + k * 8, 8);
 
-			if (retVal != HID_SMBUS_SUCCESS)
-			{
-				// error: Device Read
-				Trace(_T("ÎØÈÁÊÀ. [êîä: %02d] \n"), retVal);
-				Trace(_T("ÍÀ ÝÒÀÏÅ: ÎÁÍÎÂËÅÍÈÅ ÒÀÁËÈÖÛ \n"), retVal);
-			}
+		//	if (retVal != HID_SMBUS_SUCCESS)
+		//	{
+		//		// error: Device Read
+		//		Trace(_T("ÎØÈÁÊÀ. [êîä: %02d] \n"), retVal);
+		//		Trace(_T("ÍÀ ÝÒÀÏÅ: ÎÁÍÎÂËÅÍÈÅ ÒÀÁËÈÖÛ \n"), retVal);
+		//	}
 
-			p_cPB_OP->SetPos(40 + k * 7);
+		//	p_cPB_OP->SetPos(40 + k * 7);
 
-			Sleep(10);
-		}
+		//	Sleep(10);
+		//}
+
+		// set Data to Device
+		BYTE retVal = m_Grid.DeviceSlave_Write(v_GridVal_T10, SLAVEADDR_A2, 0x80, 128);
+
 	}
 
 	if (retVal != HID_SMBUS_SUCCESS)

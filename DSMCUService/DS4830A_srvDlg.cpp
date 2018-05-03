@@ -35,10 +35,12 @@ CDS4830A_srvDlg::CDS4830A_srvDlg(HID_SMBUS_DEVICE * pHidSmbus, BYTE mode, DWORD 
 	, m_DS4830A_SFPP_Custom(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 	, m_DS4830A_SFPP_LR_CONF_OPER(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 	, m_DS4830A_SFPP_LR_CONF_ENGI(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
+	, m_DS4830A_SFP_LX_CONF_ENGI(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 	, m_DS4830A_SFPP_MSA(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 	, m_DS4830A_SFPP_DDM(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 	, m_DS4830A_SFPP_TEC_APC(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 	, m_TB_SFP_R2(m_pHidSmbus)
+	, m_ADUC7029_XFP_WDM_CONF_ENGI(m_pHidSmbus, &m_cPB_OP, &m_EDIT_STATUS, &m_service)
 
 
 {
@@ -90,11 +92,13 @@ void CDS4830A_srvDlg::InitDlgTabs()
 		m_tabCtrl_DS4830A.InsertItem(3,  _T("ONET1130_ENGI"), IDD_PROPPAGE_DS4830A_SFPP_ER_ENGI, &m_DS4830A_SFPP_T10);
 		m_tabCtrl_DS4830A.InsertItem(4,  _T("GN1157"), IDD_PROPPAGE_DS4830A_SFPP_LR_CONF_OPER, &m_DS4830A_SFPP_LR_CONF_OPER);
 		m_tabCtrl_DS4830A.InsertItem(5,  _T("GN1157_ENGI"), IDD_PROPPAGE_DS4830A_SFPP_LR_CONF_ENGI, &m_DS4830A_SFPP_LR_CONF_ENGI);
-		m_tabCtrl_DS4830A.InsertItem(6,  _T("Custom"), IDD_PROPPAGE_DS4830A_SFPP_CUSTOM, &m_DS4830A_SFPP_Custom);
-		m_tabCtrl_DS4830A.InsertItem(7,  _T("MSA"), IDD_PROPPAGE_DS4830A_SFPP_MSA, &m_DS4830A_SFPP_MSA);
-		m_tabCtrl_DS4830A.InsertItem(8,  _T("DDM"), IDD_PROPPAGE_DS4830A_SFPP_DDM, &m_DS4830A_SFPP_DDM);
-		m_tabCtrl_DS4830A.InsertItem(9,  _T("TEC APC"), IDD_PROPPAGE_DS4830A_SFPP_ER_TEC_APC, &m_DS4830A_SFPP_TEC_APC);
-		m_tabCtrl_DS4830A.InsertItem(10, _T("TBSFP+ r2"), IDD_PROPPAGE_TB_SFP_R2, &m_TB_SFP_R2);
+		m_tabCtrl_DS4830A.InsertItem(6, _T("GN25L9x"), IDD_PROPPAGE_DS4830A_SFP_LX_CONF_ENGI, &m_DS4830A_SFP_LX_CONF_ENGI);
+		m_tabCtrl_DS4830A.InsertItem(7, _T("Custom"), IDD_PROPPAGE_DS4830A_SFPP_CUSTOM, &m_DS4830A_SFPP_Custom);
+		m_tabCtrl_DS4830A.InsertItem(8, _T("MSA"), IDD_PROPPAGE_DS4830A_SFPP_MSA, &m_DS4830A_SFPP_MSA);
+		m_tabCtrl_DS4830A.InsertItem(9, _T("DDM"), IDD_PROPPAGE_DS4830A_SFPP_DDM, &m_DS4830A_SFPP_DDM);
+		m_tabCtrl_DS4830A.InsertItem(10, _T("TEC APC"), IDD_PROPPAGE_DS4830A_SFPP_ER_TEC_APC, &m_DS4830A_SFPP_TEC_APC);
+		m_tabCtrl_DS4830A.InsertItem(11, _T("TBSFP+ r2"), IDD_PROPPAGE_TB_SFP_R2, &m_TB_SFP_R2);
+		m_tabCtrl_DS4830A.InsertItem(12, _T("GN2044_ENGI"), IDD_PROPPAGE_ADUC7029_XFP_WDM_CONF_ENGI, &m_ADUC7029_XFP_WDM_CONF_ENGI);
 
 		break;
 
@@ -105,11 +109,13 @@ void CDS4830A_srvDlg::InitDlgTabs()
 		m_tabCtrl_DS4830A.InsertItem(3, _T("ONET1130_ENGI"), IDD_PROPPAGE_DS4830A_SFPP_ER_ENGI, &m_DS4830A_SFPP_T10);
 		m_tabCtrl_DS4830A.InsertItem(4, _T("GN1157"), IDD_PROPPAGE_DS4830A_SFPP_LR_CONF_OPER, &m_DS4830A_SFPP_LR_CONF_OPER);
 		m_tabCtrl_DS4830A.InsertItem(5, _T("GN1157_ENGI"), IDD_PROPPAGE_DS4830A_SFPP_LR_CONF_ENGI, &m_DS4830A_SFPP_LR_CONF_ENGI);
-		m_tabCtrl_DS4830A.InsertItem(6, _T("Custom"), IDD_PROPPAGE_DS4830A_SFPP_CUSTOM, &m_DS4830A_SFPP_Custom);
-		m_tabCtrl_DS4830A.InsertItem(7, _T("MSA"), IDD_PROPPAGE_DS4830A_SFPP_MSA, &m_DS4830A_SFPP_MSA);
-		m_tabCtrl_DS4830A.InsertItem(8, _T("DDM"), IDD_PROPPAGE_DS4830A_SFPP_DDM, &m_DS4830A_SFPP_DDM);
-		m_tabCtrl_DS4830A.InsertItem(9, _T("TEC APC"), IDD_PROPPAGE_DS4830A_SFPP_ER_TEC_APC, &m_DS4830A_SFPP_TEC_APC);
-		m_tabCtrl_DS4830A.InsertItem(10, _T("TBSFP+ r2"), IDD_PROPPAGE_TB_SFP_R2, &m_TB_SFP_R2);
+		m_tabCtrl_DS4830A.InsertItem(6, _T("GN25L9x"), IDD_PROPPAGE_DS4830A_SFP_LX_CONF_ENGI, &m_DS4830A_SFP_LX_CONF_ENGI);
+		m_tabCtrl_DS4830A.InsertItem(7, _T("Custom"), IDD_PROPPAGE_DS4830A_SFPP_CUSTOM, &m_DS4830A_SFPP_Custom);
+		m_tabCtrl_DS4830A.InsertItem(8, _T("MSA"), IDD_PROPPAGE_DS4830A_SFPP_MSA, &m_DS4830A_SFPP_MSA);
+		m_tabCtrl_DS4830A.InsertItem(9, _T("DDM"), IDD_PROPPAGE_DS4830A_SFPP_DDM, &m_DS4830A_SFPP_DDM);
+		m_tabCtrl_DS4830A.InsertItem(10, _T("TEC APC"), IDD_PROPPAGE_DS4830A_SFPP_ER_TEC_APC, &m_DS4830A_SFPP_TEC_APC);
+		m_tabCtrl_DS4830A.InsertItem(11, _T("TBSFP+ r2"), IDD_PROPPAGE_TB_SFP_R2, &m_TB_SFP_R2);
+		m_tabCtrl_DS4830A.InsertItem(12, _T("GN2044_ENGI"), IDD_PROPPAGE_ADUC7029_XFP_WDM_CONF_ENGI, &m_ADUC7029_XFP_WDM_CONF_ENGI);
 
 		break;
 
@@ -1247,11 +1253,21 @@ void CDS4830A_srvDlg::OnBnClickedButtonRead()
 
 		break;
 
-	case 6:	//m_DS4830A_SFPP_Custom
+	case 6:
+		m_service.activeState = SERVICE_STATE_DISABLING;
+
+		m_DS4830A_SFP_LX_CONF_ENGI.OnBnClickedButton4();
+
+		m_service.activeState = SERVICE_STATE_ENABLING;
+
+		break;
+
+
+	case 7:	//m_DS4830A_SFPP_Custom
 		m_DS4830A_SFPP_Custom.OnBnClickedButton4();
 		break;
 
-	case 7:	//m_DS4830A_SFPP_MSA	
+	case 8:	//m_DS4830A_SFPP_MSA	
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		m_DS4830A_SFPP_MSA.OnBnClickedButton4();
@@ -1260,7 +1276,7 @@ void CDS4830A_srvDlg::OnBnClickedButtonRead()
 
 		break;
 
-	case 8:	//m_DS4830A_SFPP_DDM	
+	case 9:	//m_DS4830A_SFPP_DDM	
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		m_DS4830A_SFPP_DDM.OnBnClickedButton4();
@@ -1269,10 +1285,19 @@ void CDS4830A_srvDlg::OnBnClickedButtonRead()
 
 		break;
 
-	case 9:	//m_DS4830A_SFPP_TEC_APC	
+	case 11:	//m_DS4830A_SFPP_TEC_APC	
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		m_DS4830A_SFPP_TEC_APC.OnBnClickedButton4();
+
+		m_service.activeState = SERVICE_STATE_ENABLING;
+
+		break;
+
+	case 12:	//m_DS4830A_SFPP_TEC_APC	
+		m_service.activeState = SERVICE_STATE_DISABLING;
+
+		m_ADUC7029_XFP_WDM_CONF_ENGI.OnBnClickedButton4();
 
 		m_service.activeState = SERVICE_STATE_ENABLING;
 
@@ -1353,11 +1378,30 @@ void CDS4830A_srvDlg::OnBnClickedButtonWrite()
 
 		break;
 
-	case 6:	//m_DS4830A_SFPP_Custom
+	case 6:
+		m_service.activeState = SERVICE_STATE_DISABLING;
+
+		// Read OP
+		m_DS4830A_SFPP_LR_CONF_ENGI.NoUpdateRead();
+
+		// Set OP
+		m_DS4830A_SFP_LX_CONF_ENGI.OnBnClickedButtonBiasSet();
+		m_DS4830A_SFP_LX_CONF_ENGI.OnBnClickedButtonModSet();
+		//m_DS4830A_SFP_LX_CONF_ENGI.OnBnClickedButtonHorSet();
+		//m_DS4830A_SFP_LX_CONF_ENGI.OnBnClickedButtonVerticalSet();
+
+		// Write OP
+		m_DS4830A_SFP_LX_CONF_ENGI.OnBnClickedButton5();
+
+		m_service.activeState = SERVICE_STATE_ENABLING;
+
+		break;
+
+	case 7:	//m_DS4830A_SFPP_Custom
 		m_DS4830A_SFPP_Custom.OnBnClickedButton5();
 		break;
 
-	case 7:	//m_DS4830A_SFPP_MSA	
+	case 8:	//m_DS4830A_SFPP_MSA	
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		m_DS4830A_SFPP_MSA.OnBnClickedButton5();
@@ -1366,7 +1410,7 @@ void CDS4830A_srvDlg::OnBnClickedButtonWrite()
 
 		break;
 
-	case 8:	//m_DS4830A_SFPP_DDM	
+	case 9:	//m_DS4830A_SFPP_DDM	
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		m_DS4830A_SFPP_DDM.OnBnClickedButton5();
@@ -1375,10 +1419,19 @@ void CDS4830A_srvDlg::OnBnClickedButtonWrite()
 
 		break;
 
-	case 9:	//m_DS4830A_SFPP_TEC_APC	
+	case 11:	//m_DS4830A_SFPP_TEC_APC	
 		m_service.activeState = SERVICE_STATE_DISABLING;
 
 		m_DS4830A_SFPP_TEC_APC.OnBnClickedButton5();
+
+		m_service.activeState = SERVICE_STATE_ENABLING;
+
+		break;
+
+	case 12:	//m_DS4830A_SFPP_TEC_APC	
+		m_service.activeState = SERVICE_STATE_DISABLING;
+
+		m_ADUC7029_XFP_WDM_CONF_ENGI.OnBnClickedButton5();
 
 		m_service.activeState = SERVICE_STATE_ENABLING;
 
@@ -1514,7 +1567,7 @@ void CDS4830A_srvDlg::OnNMClickTabDs4830a(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 
 
-	case 9:	//m_DS4830A_SFPP_TEC_APC	
+	case 10:	//m_DS4830A_SFPP_TEC_APC	
 
 		m_DS4830A_SFPP_TEC_APC.StartTimer();
 
@@ -1522,7 +1575,7 @@ void CDS4830A_srvDlg::OnNMClickTabDs4830a(NMHDR *pNMHDR, LRESULT *pResult)
 
 		break;
 
-	case 10:	//m_DS4830A_SFPP_TEC_APC	
+	case 11:	//m_DS4830A_SFPP_TEC_APC	
 
 		m_TB_SFP_R2.StartTimer();
 

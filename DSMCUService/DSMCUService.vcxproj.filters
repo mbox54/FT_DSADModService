@@ -31,6 +31,12 @@
     <Filter Include="Header Files\GridTable">
       <UniqueIdentifier>{18b0562d-0751-4086-9af4-2aa7aee6b80e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ADuC7029_tabs">
+      <UniqueIdentifier>{e19b932d-4477-47f6-8684-0a570635bdb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ADuC7029_tabs">
+      <UniqueIdentifier>{99a51087-4c23-41dd-974c-b480922b3cb1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -132,6 +138,12 @@
     <ClInclude Include="TB_SFP_R2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DS4830A_SFP_LX_CONF_ENGI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADUC7029_XFP_WDM_CONF_ENGI.h">
+      <Filter>Header Files\ADuC7029_tabs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DSMCUService.cpp">
@@ -217,6 +229,12 @@
     </ClCompile>
     <ClCompile Include="TB_SFP_R2.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DS4830A_SFP_LX_CONF_ENGI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADUC7029_XFP_WDM_CONF_ENGI.cpp">
+      <Filter>Source Files\ADuC7029_tabs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

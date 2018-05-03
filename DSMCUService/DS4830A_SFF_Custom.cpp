@@ -23,6 +23,8 @@ CDS4830A_SFF_Custom::CDS4830A_SFF_Custom(CWnd* pParent /*=NULL*/)
 	, m_SelAddr(_T(""))
 	, m_SelCount(_T(""))
 	, m_bCheck_TabSelect(FALSE)
+	, m_bCheck_AutoClear(FALSE)
+	, m_RadioWorkMode(0)
 {
 
 }
@@ -68,6 +70,9 @@ void CDS4830A_SFF_Custom::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_SELCNT, m_SelCount);
 	DDV_MaxChars(pDX, m_SelCount, 3);
 	DDX_Check(pDX, IDC_CHECK_TABENABLE, m_bCheck_TabSelect);
+	//  DDX_Control(pDX, IDC_CHECK_AUTO_CLEAR, m_bCheck_AutoClear);
+	DDX_Check(pDX, IDC_CHECK_AUTO_CLEAR, m_bCheck_AutoClear);
+	DDX_Radio(pDX, IDC_RADIO1, m_RadioWorkMode);
 }
 
 
@@ -139,8 +144,10 @@ void CDS4830A_SFF_Custom::EditInit()
 void CDS4830A_SFF_Custom::OnGridClick(NMHDR * pNotifyStruct, LRESULT * pResult)
 {
 	NM_GRIDVIEW* pItem = (NM_GRIDVIEW*)pNotifyStruct;
-	Trace(_T("Clicked on row %d, col %d\n"), pItem->iRow, pItem->iColumn);
-	Trace(_T("Text: %s\n"), m_Grid.GetItemText(pItem->iRow, pItem->iColumn));
+
+	BYTE ucNumber = 16 * (pItem->iRow - 1) + pItem->iColumn - 1;
+
+	Trace(_T("Byte 0x%02X (%d), Value: %s\n"), ucNumber, ucNumber, m_Grid.GetItemText(pItem->iRow, pItem->iColumn));
 	//Item.strText
 }
 
@@ -175,6 +182,7 @@ BEGIN_MESSAGE_MAP(CDS4830A_SFF_Custom, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_TABLNAME, &CDS4830A_SFF_Custom::OnEnChangeEditTablname)
 	ON_EN_CHANGE(IDC_EDIT_PASADDR, &CDS4830A_SFF_Custom::OnEnChangeEditPasaddr)
 	ON_EN_CHANGE(IDC_EDIT_PASVALUE, &CDS4830A_SFF_Custom::OnEnChangeEditPasvalue)
+	ON_BN_CLICKED(IDC_BUTTON6, &CDS4830A_SFF_Custom::OnBnClickedButton6)
 END_MESSAGE_MAP()
 
 // -------------------------------------------------------------------
@@ -306,7 +314,7 @@ void CDS4830A_SFF_Custom::OnBnClickedButton4()
 	WORD uiAddrCount = 256;
 
 	// check Address Select
-	if (this->m_bCheck_SelRange)
+	if (this->m_RadioWorkMode == 1)
 	{
 		// SafeCheck
 		if (uSEL_ADDR < 0x100)
@@ -419,8 +427,9 @@ void CDS4830A_SFF_Custom::OnBnClickedButton5()
 	BYTE ucAddrStart = 0;
 	WORD uiAddrCount = 256;
 
+
 	// check Select
-	if (this->m_bCheck_SelRange)
+	if (this->m_RadioWorkMode == 1)
 	{
 		// SafeCheck
 		if (uSEL_ADDR < 0x100)
@@ -439,57 +448,94 @@ void CDS4830A_SFF_Custom::OnBnClickedButton5()
 				uiAddrCount = uSEL_CNT;
 			}
 		}
+
+		
 	}
 
-	p_cPB_OP->SetPos(40);
-
-	// get Values
-	m_Grid.GridSFF_Read(v_WriteBytes, ucAddrStart, uiAddrCount);
-
-	BYTE byteBlock_cnt = uiAddrCount / 8;
-	BYTE byteBlock_lst = uiAddrCount - byteBlock_cnt * 8;
-
-	// Write to Device
-	if (byteBlock_cnt > 0)
+	if ( (this->m_RadioWorkMode == 0) || (this->m_RadioWorkMode == 1) )
 	{
-		for (int k = 0; k < byteBlock_cnt; k++)
+		// [WRITE MODE 8BYTE]
+
+		p_cPB_OP->SetPos(40);
+
+		// get Values
+		m_Grid.GridSFF_Read(v_WriteBytes, ucAddrStart, uiAddrCount);
+
+		BYTE byteBlock_cnt = uiAddrCount / 8;
+		BYTE byteBlock_lst = uiAddrCount - byteBlock_cnt * 8;
+
+		// Write to Device
+		if (byteBlock_cnt > 0)
+		{
+			for (int k = 0; k < byteBlock_cnt; k++)
+			{
+				// prepare write buffer
+				for (int k2 = 0; k2 < 8; k2++)
+				{
+					v_WrByte8[k2] = v_WriteBytes[k * 8 + k2];
+				}
+
+				// i2c write
+				// NOTE: 8byte mode
+				m_Grid.DeviceSlave_Write(v_WrByte8, uSLA_ADDR, ucAddrStart + k * 8, 8);
+
+				// output progress
+				p_cPB_OP->SetPos(40 + k * 7);
+
+				// ATTENTION! This delay is critical.
+				Sleep(200);
+			}
+		}
+
+		if (byteBlock_lst > 0)
 		{
 			// prepare write buffer
-			for (int k2 = 0; k2 < 8; k2++)
+			for (int k2 = 0; k2 < byteBlock_lst; k2++)
 			{
-				v_WrByte8[k2] = v_WriteBytes[k * 8 + k2];
+				v_WrByte8[k2] = v_WriteBytes[byteBlock_cnt * 8 + k2];
 			}
 
 			// i2c write
 			// NOTE: 8byte mode
-			m_Grid.DeviceSlave_Write(v_WrByte8, uSLA_ADDR, ucAddrStart + k * 8, 8);
+			m_Grid.DeviceSlave_Write(v_WrByte8, uSLA_ADDR, ucAddrStart + byteBlock_cnt * 8, byteBlock_lst);
 
-			// output progress
-			p_cPB_OP->SetPos(40 + k * 7);
-
-			Sleep(10);
 		}
+
+		p_cPB_OP->SetPos(100);
+
 	}
 
-	if (byteBlock_lst > 0)
+
+	if (this->m_RadioWorkMode == 2)
 	{
-		// prepare write buffer
-		for (int k2 = 0; k2 < byteBlock_lst; k2++)
+		// [FILLED CELLS WRITE MODE 1BYTE]
+
+		// check every cells, write if not null
+		for (BYTE kRows = 0; kRows < 16; kRows++)
 		{
-			v_WrByte8[k2] = v_WriteBytes[byteBlock_cnt * 8 + k2];
+			for (BYTE kCols = 0; kCols < 16; kCols++)
+			{
+
+				// extract Cell Text
+				CString cellText = m_Grid.GetItemText(kRows + 1, kCols + 1);
+
+				// check Text
+				if (cellText != "")
+				{
+					// [NEED TO WRITE]
+
+					// get BYTE
+					BYTE v_Value[1];
+					v_Value[0] = (BYTE)_tcstoul(cellText, NULL, 16);
+
+					m_Grid.DeviceSlave_Write(v_Value, uSLA_ADDR, kRows * 16 + kCols, 1);
+					Sleep(20);
+				}
+			}
 		}
-
-		// i2c write
-		// NOTE: 8byte mode
-		m_Grid.DeviceSlave_Write(v_WrByte8, uSLA_ADDR, ucAddrStart + byteBlock_cnt * 8, byteBlock_lst);
-
-	}
-
-	p_cPB_OP->SetPos(100);
+	}//if (this->m_RadioWorkMode == 2)
 
 }
-
-
 
 
 
@@ -533,4 +579,11 @@ void CDS4830A_SFF_Custom::OnOK()
 	// TODO: Add your specialized code here and/or call the base class
 
 	// CDialog::OnOK();
+}
+
+
+void CDS4830A_SFF_Custom::OnBnClickedButton6()
+{
+	// clear Table
+	m_Grid.ClearTable();
 }

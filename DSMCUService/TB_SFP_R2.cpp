@@ -111,12 +111,12 @@ void CTB_SFP_R2::ProcLatchState()
 	if (latchValue & HID_SMBUS_MASK_GPIO_3)
 	{
 		strStateText.AppendFormat(L"[1]: лазер отключен");
-		strStateText.AppendFormat(L"Вкл.");
+		strButtonText.AppendFormat(L"Вкл.");
 	}
 	else
 	{
 		strStateText.AppendFormat(L"[0]: лазер включен");
-		strStateText.AppendFormat(L"Выкл.");
+		strButtonText.AppendFormat(L"Выкл.");
 	}
 
 	pStaticTxDisable->SetWindowTextW(strStateText);
